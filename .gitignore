@@ -1,0 +1,7 @@
+## .gitignore
+
+# web application file
+.vscode
+data/__pycache__
+data/migrations/__pycache__
+pyrest/__pycache__

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import viewsets
@@ -8,7 +8,9 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
 from data.permissions import IsOwnerOrReadOnly
-from data.serializers import *
+from data.models import User, Blog, ApKpi
+from data.serializers import UserRegisterSerializer, UserSerializer, BlogSerializer, ApKpiSerializer
+import os
 
 
 # 用于注册
@@ -48,6 +50,19 @@ class UserLoginAPIView(APIView):
             self.request.session['user_id'] = user.id
             return Response(new_data, status=HTTP_200_OK)
         return Response('password error', HTTP_400_BAD_REQUEST)
+
+
+# 处理apkpi数据
+class ApKpiHandleAPIView(APIView):
+    queryset = ApKpi.objects.all()
+    serializer_class = ApKpiSerializer
+    permission_classes = (AllowAny, )
+
+    def post(self, request, format=None):
+        data = request.data
+        url = data.get('url')
+        print("python " + url)
+        return Response("new_data", status=HTTP_200_OK)
 
 
 # 用于博客的增删改查  除了查看，其他都需要权限

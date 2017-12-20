@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from data.models import *
+from data.models import Blog, User, ApKpi
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class BlogSerializer(serializers.ModelSerializer):
         fields = ('title', 'body', 'owner')
 
 
-#用于注册的时候返回json数据
+# 用于注册的时候返回json数据
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -20,4 +20,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username','name')
+        fields = ('username', 'name')
+
+
+class ApKpiSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ApKpi
+        fields = ('title', 'owner')   

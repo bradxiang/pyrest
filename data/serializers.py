@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from data.models import Blog, User, ApKpi
+from data.models import Blog, User
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -23,7 +23,3 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'name')
 
 
-class ApKpiSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ApKpi
-        fields = ('title', 'owner')   

@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
+from rest_framework.authtoken import views
 import data.views
 
 router = routers.DefaultRouter()
@@ -27,5 +28,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^register', data.views.UserRegisterAPIView.as_view()),
     url(r'^login', data.views.UserLoginAPIView.as_view()),
-    url(r'^data/apkpi', data.views.ApKpiHandleAPIView.as_view()),
+    url(r'^data/apkpi', data.views.ApKpiAPIView.as_view()),
+    url(r'^api-auth/',
+        include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-token-auth/', views.obtain_auth_token),
 ]

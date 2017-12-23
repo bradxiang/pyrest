@@ -3,18 +3,24 @@
 # Create your views here.
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
-from data.permissions import IsOwnerOrReadOnly
-from data.models import User, Blog, ApKpi
-from data.serializers import UserRegisterSerializer, UserSerializer, BlogSerializer, ApKpiSerializer
-import os
+# from data.permissions import IsOwnerOrReadOnly
+from data.models import User, Blog
+from data.serializers import UserRegisterSerializer, UserSerializer, BlogSerializer
+from django.http import HttpResponseRedirect
+from handler.ap_kpi import ApKpi
 
 
-# 用于注册
 class UserRegisterAPIView(APIView):
+    """
+    用于测试自己实现的用户注册
+    """
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = (AllowAny, )
@@ -32,8 +38,10 @@ class UserRegisterAPIView(APIView):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-# 用于登录
 class UserLoginAPIView(APIView):
+    """
+    用于测试自己实现的用户登入
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AllowAny, )
@@ -51,25 +59,47 @@ class UserLoginAPIView(APIView):
             return Response(new_data, status=HTTP_200_OK)
         return Response('password error', HTTP_400_BAD_REQUEST)
 
+    def get(self, request, format=None):
+        return HttpResponseRedirect('http://127.0.0.1:8083/')  # 跳转到index界面
 
-# 处理apkpi数据
-class ApKpiHandleAPIView(APIView):
-    queryset = ApKpi.objects.all()
-    serializer_class = ApKpiSerializer
+
+class ApKpiAPIView(APIView):
+    """
+    处理apkpi数据
+    """
     permission_classes = (AllowAny, )
+
+    def get(self, request, format=None):
+        path = request.GET.get('path')
+        out_contents = list()
+        ap = ApKpi()
+        ap.pre_process(path, out_contents)
+        contents = "<html><body>"
+        for content in out_contents:
+            contents = contents + content
+        contents = contents + "</body></html>"
+        return HttpResponse(contents)
 
     def post(self, request, format=None):
         data = request.data
-        url = data.get('url')
-        print("python " + url)
-        return Response("new_data", status=HTTP_200_OK)
+        path = data.get('path')
+        header = {'Access-Control-Allow-Origin': '*'}
+        if path == "undefined":
+            return Response("请上传文件", status=HTTP_200_OK, headers=header)
+        out_contents = list()
+        ap = ApKpi()
+        ap.pre_process(path, out_contents)
+        contents = str()
+        for content in out_contents:
+            contents = contents + content
+        return Response(contents, status=HTTP_200_OK, headers=header)
 
 
-# 用于博客的增删改查  除了查看，其他都需要权限
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
-    permission_classes = (IsOwnerOrReadOnly, )
+    # permission_classes = (IsOwnerOrReadOnly, )
+    permission_classes = (AllowAny, )
 
     def perform_create(self, serializer):
         serializer.save(

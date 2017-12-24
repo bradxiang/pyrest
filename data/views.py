@@ -85,14 +85,15 @@ class ApKpiAPIView(APIView):
         path = data.get('path')
         header = {'Access-Control-Allow-Origin': '*'}
         if path == "undefined":
-            return Response("请上传文件", status=HTTP_200_OK, headers=header)
+            return Response("error", status=HTTP_200_OK, headers=header)
         out_contents = list()
         ap = ApKpi()
-        ap.pre_process(path, out_contents)
+        file_path = ap.pre_process(path, out_contents)
         contents = str()
         for content in out_contents:
             contents = contents + content
-        return Response(contents, status=HTTP_200_OK, headers=header)
+        print(file_path)
+        return Response(file_path, status=HTTP_200_OK, headers=header)
 
 
 class BlogViewSet(viewsets.ModelViewSet):

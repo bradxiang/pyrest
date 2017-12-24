@@ -15,8 +15,14 @@ class ApKpi():
         data_columns = None
         group = pd.DataFrame()
         temp = in_file_name.split('\\')
-        out_file_name = self.get_desktop(
-        ) + '/DATA/kpi-ap-aging-output-' + temp[len(temp) - 1]
+        # out_file_name = self.get_desktop(
+        # ) + '/DATA/kpi-ap-aging-output-' + temp[len(temp) - 1]
+        out_file_name = in_file_name.replace(
+            temp[len(temp) - 1],
+            "") + 'kpi-ap-aging-output-' + temp[len(temp) - 1]
+        out_file_name = out_file_name.replace("_copy", "")
+        temp = out_file_name.split('\\')
+        url_file_name = temp[len(temp) - 2] + "\\" + temp[len(temp) - 1]
         xls_file = pd.ExcelFile(in_file_name)
         b = xlrd.open_workbook(in_file_name)
         contents.append(
@@ -27,7 +33,7 @@ class ApKpi():
                     data = xls_file.parse(sheet.name, fill_value=0)
                 except Exception as e:
                     contents.append('ERROR: ' + e + '，文件无法处理，请上传正确格式文件！！！<br />')
-                    return
+                    return "error"
                 data.insert(0, "entity", sheet.name)
                 data.insert(1, "plant", sheet.name)
                 if sheet.name == "0982":
@@ -124,6 +130,7 @@ class ApKpi():
         try:
             writer.save()
             contents.append('生成文件' + out_file_name + '<br />')
+            return url_file_name
         except Exception as e:
             contents.append('文件生成错误<br />')
 
@@ -151,4 +158,5 @@ class ApKpi():
     def pre_process(self, in_file_name, contents):
         mkpath = self.get_desktop() + '/DATA'  # 定义要创建的目录
         self.make_dir(mkpath, contents)
-        self.process_excel(in_file_name, contents)
+        file_path = self.process_excel(in_file_name, contents)
+        return file_path
